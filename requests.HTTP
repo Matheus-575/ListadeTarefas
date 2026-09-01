@@ -9,3 +9,14 @@ Content-Type: application/json
 
 ### Listar tarefas
 GET http://localhost:3000/tarefas
+
+### Atualizar tarefa
+PUT http://localhost:3000/tarefas/1
+Content-Type: application/json
+
+{
+  "completada": true
+}
+
+### Deletar tarefa
+DELETE http://localhost:3000/tarefas/0

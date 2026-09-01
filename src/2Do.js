@@ -4,12 +4,18 @@ import { log } from "console";
 
 
 const qst = readline.createInterface({ input, output });
+const API_URL = "http://localhost:3000/tarefas";
+
+function limparTela(){
+  console.clear();
+}
 
 const lista = [
   "1 - Adicionar tarefa",
   "2 - Listar tarefas",
-  "3 - Remover tarefa",
-  "4 - sair",
+  "3 - Completar tarefa",
+  "4 - Remover tarefa",
+  "5 - sair"
 ];
 
 const menuTexto =
@@ -17,6 +23,77 @@ const menuTexto =
   lista.join("\n") +
   "\n";
 
+//Func para adicionar tarefas
+async function adicionarTarefa() {
+  const titulo = await qst.question("Digite o título da tarefa: ")
+  const descricao = await qst.question("Descreva a tarefa: ")
+
+  const resposta = await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ titulo, descricao}),
+  })
+  
+  const dados = await resposta.json()
+
+  if (!resposta.ok) {
+    log(`Erro: ${dados.error}\n`)
+    return;
+  }
+  log(`Tarefa "${dados.titulo}" adicionada com sucesso!\n`)
+}
+
+//Func para listar tarefas
+async function listarTarefas() {
+  const resposta = await fetch(API_URL)
+  const tarefas = await resposta.json()
+  
+  if (tarefas.length === 0){
+    log("Nenhuma tarefa cadastrada por enquanto...\n")
+    return
+  }
+
+  log("\nTarefas cadastradas: \n")
+  tarefas.forEach((tarf) => {
+    const status = tarf.completada ? "[X]" : "[ ]"
+    log(`${status} #${tarf.id} - ${tarf.titulo} - ${tarf.descricao || "sem descrição informada"}`)
+  })
+  log("")
+}
+
+//Func para mudar status das tarefas
+async function completarTarefa(){
+  const id = await qst.question("Digite o ID da tarefa realizada: ")
+  const resposta = await fetch(`${API_URL}/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ completada: true })
+  })
+  const dados = await resposta.json()
+
+  if(!resposta.ok){
+    log(`Erro: ${dados.error}\n`)
+    return
+  }
+  log(`${dados.mensagem}\n`)
+}
+
+//Func para remover as tarefas
+async function removerTarefa(){
+  const id = await qst.question("Digite o ID da tarefa que deseja remover: ")
+  const resposta = await fetch(`${API_URL}/${id}`, {
+    method: "DELETE"
+  })
+  const dados = await resposta.json()
+  
+  if(!resposta.ok){
+    log(`Erro: ${dados.error}\n`)
+    return
+  }
+  log(`${dados.mensagem}\n`)
+}
+
+//Func do menu principal
 async function menu() {
   let rodando = true;
 
@@ -25,23 +102,33 @@ async function menu() {
 
     switch (resposta.trim()) {
       case "1":
-        const add = await qst.question(
-          "Digite a tarefa que deseja adicionar: ",
-        );
-        console.log(`Tarefa "${add}" adicionada com sucesso!\n`);
+        limparTela()
+        await adicionarTarefa();
         break;
       case "2":
-        log("Listando tarefas. . .");
+        limparTela()
+        await listarTarefas();
         break;
       case "3":
-        log("Removendo tarefa. . .");
+        limparTela()
+        await listarTarefas()
+        await completarTarefa();
         break;
       case "4":
-        log("Saindo do programa. . .");
+        limparTela()
+        await listarTarefas()
+        await removerTarefa()
+        break;
+      case "5":
+        limparTela()
+        log("Saindo do 2Do... Volte logo!\n")
         rodando = false;
         break;
+        default:
+          limparTela()
+          log("Opção inválida... Digite uma opção válida.\n")
     }
   }
+  qst.close();
 }
-
 menu();

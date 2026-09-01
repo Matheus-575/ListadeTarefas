@@ -14,6 +14,7 @@ export async function criarTarefa(req, res) {
       .status(201)
       .json({ id: result.insertId, titulo, descricao, completada: false });
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error: error.message });
   }
 }
@@ -25,6 +26,7 @@ export async function listarTarefas(req, res) {
     );
     res.json(pegarTarefas);
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error: error.message });
   }
 }
@@ -54,6 +56,7 @@ export async function atualizarTarefa(req, res) {
     );
     res.json({ mensagem: "Tarefa atualizada com sucesso!" });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 }
@@ -69,6 +72,7 @@ export async function deletarTarefa(req, res) {
     }
     res.json({ mensagem: "Tarefa removida com sucesso!" });
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error: error.message });
   }
 }
