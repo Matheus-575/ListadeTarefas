@@ -14,8 +14,9 @@ const lista = [
   "1 - Adicionar tarefa",
   "2 - Listar tarefas",
   "3 - Completar tarefa",
-  "4 - Remover tarefa",
-  "5 - sair"
+  "4 - Editar tarefa",
+  "5 - Remover tarefa",
+  "6 - sair"
 ];
 
 const menuTexto =
@@ -93,6 +94,32 @@ async function removerTarefa(){
   log(`${dados.mensagem}\n`)
 }
 
+//Func para editar as tarefas
+async function editarTarefa(){
+  const id = await qst.question("Digite o ID da tarefa que será editada: ")
+  const titulo = await qst.question("Digite o novo título da tarefa: (Deixe em branco para não alterar)")
+  const descricao = await qst.question("Digite a nova descrição da tarefa: (Deixe em branco para não alterar)")
+
+const dadosAtualizados = {}
+if(titulo) dadosAtualizados.titulo = titulo
+if(descricao) dadosAtualizados.descricao = descricao
+
+const resposta = await fetch(`${API_URL}/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(dadosAtualizados)
+})
+
+const resultado = await resposta.json()
+
+if(!resposta.ok){
+  log(`Erro: ${resultado.error}\n`)
+  return
+}
+log(`${resultado.mensagem}\n`)
+}
+
+
 //Func do menu principal
 async function menu() {
   let rodando = true;
@@ -117,9 +144,14 @@ async function menu() {
       case "4":
         limparTela()
         await listarTarefas()
-        await removerTarefa()
+        await editarTarefa()
         break;
       case "5":
+        limparTela()
+        await listarTarefas()
+        await removerTarefa()
+        break;
+      case "6":
         limparTela()
         log("Saindo do 2Do... Volte logo!\n")
         rodando = false;

@@ -20,3 +20,6 @@ Content-Type: application/json
 
 ### Deletar tarefa
 DELETE http://localhost:3000/tarefas/0
+
+### Editar tarefa
+PATCH http://localhost:3000/tarefas/1

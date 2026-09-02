@@ -7,5 +7,6 @@ router.post("/", criarTarefa);
 router.get("/", listarTarefas);
 router.put("/:id", atualizarTarefa);
 router.delete("/:id", deletarTarefa);
+router.patch("/:id", atualizarTarefa);
 
 export default router;
